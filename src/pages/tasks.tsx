@@ -14,6 +14,7 @@ const Tasks = () => {
   const { allTasks } = useAppSelector((state: RootState) => state.allTasks);
   const [taskPopup, setTaskPopup] = useState(false);
   const [activeTask, setActiveTask] = useState("");
+  
   useEffect(() => {
     if (currentUser?.userName) {
     } else {
@@ -38,7 +39,7 @@ const Tasks = () => {
         <header className="flex items-center justify-between p-6">
           {currentUser?.userType !== "user" && <Link to="/users">Users</Link>}
           <button
-            className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 px-8"
+            className="focus:ring-2 ml-auto focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 px-8"
             onClick={() => {
               dispatch(addCurrentUser({}));
               navigate("/login");
@@ -82,8 +83,8 @@ const Tasks = () => {
                 </tr>
               </thead>
               <tbody>
-                {allTasks.map((task) => (
-                  <tr className="h-24 border-gray-300 border-b">
+                {allTasks.map((task, idx) => (
+                  <tr className="h-24 border-gray-300 border-b" key={idx}>
                     <td className="text-sm pr-6 whitespace-no-wrap text-gray-800 tracking-normal leading-4">
                       {task.id}
                     </td>
@@ -157,7 +158,6 @@ const TaskPopup = ({
     if (activeTask) {
       let dup = [...allTasks];
       dup = dup.filter((task) => task.id !== activeTask.id);
-      console.log("dup", dup);
       dup.push(formData);
       dup.reverse();
       dispatch(addNewTask(dup));

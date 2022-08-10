@@ -4,6 +4,7 @@ export interface AllUsersState {
   allUsers: Person[];
 }
 type Person = {
+  id: number;
   userName: string;
   password: string;
   active: boolean;
@@ -16,28 +17,28 @@ type Person = {
 const initialState: AllUsersState = {
   allUsers: [
     {
-        userName: "Ali",
-        password: "Ali@1234",
-        active: true,
-        userType: "admin",
-        createDate: "",
-        activationDate:"",
-        deActivationDate: "",
-        updatedDate: "",
-        
+      id: 1,
+      userName: "Ali",
+      password: "Ali@1234",
+      active: true,
+      userType: "admin",
+      createDate: "",
+      activationDate: "",
+      deActivationDate: "",
+      updatedDate: "",
     },
     {
-        userName: "Junaid",
-        password: "Junaid@1234",
-        active: true,
-        userType: "user",
-        createDate: "",
-        activationDate:"",
-        deActivationDate: "",
-        updatedDate: "",
-        
+      id: 2,
+      userName: "Junaid",
+      password: "Junaid@1234",
+      active: true,
+      userType: "user",
+      createDate: "",
+      activationDate: "",
+      deActivationDate: "",
+      updatedDate: "",
     },
-  ]
+  ],
 };
 
 export const allUsersSlice = createSlice({
@@ -45,7 +46,7 @@ export const allUsersSlice = createSlice({
   initialState,
   reducers: {
     addNewUser: (state, action) => {
-      state.allUsers =action.payload;
+      state.allUsers = action.payload
     },
   },
 });
