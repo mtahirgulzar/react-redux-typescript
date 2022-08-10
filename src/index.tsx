@@ -29,7 +29,7 @@ root.render(
             <Route path="/login" element={<Login />} />
           </Routes>
         </BrowserRouter>
-        <ToastContainer />
+        <ToastContainer position="top-center"/>
       </PersistGate>
     </Provider>
   </React.StrictMode>
