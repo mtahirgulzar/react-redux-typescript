@@ -6,7 +6,8 @@ import { RootState } from "../app/store";
 import { addNewTask } from "../features/user/allTasksSlice";
 import { addCurrentUser } from "../features/user/userSlice";
 import { Link } from "react-router-dom";
-
+import { MultiSelect } from "react-multi-select-component";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 const Tasks = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -14,7 +15,10 @@ const Tasks = () => {
   const { allTasks } = useAppSelector((state: RootState) => state.allTasks);
   const [taskPopup, setTaskPopup] = useState(false);
   const [activeTask, setActiveTask] = useState("");
-  
+  const [tasks, setTasks] = useState<{ id: string, task_name: string, task_date: string, actions: { label: string, value: string }[] }[]>([])
+  useEffect(() => {
+    setTasks(allTasks)
+  }, [allTasks])
   useEffect(() => {
     if (currentUser?.userName) {
     } else {
@@ -32,6 +36,50 @@ const Tasks = () => {
     setActiveTask(task);
     setTaskPopup(true);
   };
+  // a little function to help us with reordering the result
+  const reorder = (list:any, startIndex:any, endIndex:any) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  };
+
+  const grid = 8;
+
+  const getItemStyle = (isDragging:any, draggableStyle:any) => ({
+    // some basic styles to make the items look a bit nicer
+    userSelect: "none",
+    padding: grid * 2,
+    margin: `0 0 ${grid}px 0`,
+
+    // change background colour if dragging
+    background: isDragging ? "#eee" : "white",
+
+    // styles we need to apply on draggables
+    ...draggableStyle
+  });
+
+  const getListStyle = (isDraggingOver:any) => ({
+    background: isDraggingOver ? "lightblue" : "white",
+    padding: grid,
+    width: "100%"
+  });
+
+  function onDragEnd(result:any) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const items: any = reorder(
+      tasks,
+      result.source.index,
+      result.destination.index
+    );
+
+    setTasks(items)
+  }
 
   return (
     <>
@@ -42,6 +90,7 @@ const Tasks = () => {
             className="focus:ring-2 ml-auto focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 px-8"
             onClick={() => {
               dispatch(addCurrentUser({}));
+              dispatch(addNewTask([]))
               navigate("/login");
             }}
           >
@@ -82,37 +131,66 @@ const Tasks = () => {
                   </th>
                 </tr>
               </thead>
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="droppable">
+                  {(provided:any, snapshot:any) => (
+                    <tbody
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      style={getListStyle(snapshot.isDraggingOver)}
+                    >
+                      {tasks.map((task, index) => (
+                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                          {(provided:any, snapshot:any) => (
+                            
+                              <tr 
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                snapshot.isDragging,
+                                provided.draggableProps.style
+                              )} className="h-24 border-gray-300 border-b">
+                                <td className="text-sm pr-6 whitespace-no-wrap text-gray-800 tracking-normal leading-4">
+                                  {task.id}
+                                </td>
+                                <td className="text-sm pr-6 whitespace-no-wrap text-gray-800 tracking-normal leading-4">
+                                  {task.task_name}
+                                </td>
+                                <td className="text-sm pr-6 whitespace-no-wrap text-gray-800 tracking-normal leading-4">
+                                  {task.task_date}
+                                </td>
+                                <td className="pr-8 relative ">
+                                  {
+                                    task.actions.map((action) => `${action.value}, `)
+                                  }
+                                </td>
+                                <td className="pr-8  w-32">
+                                  <div className="flex items-center relative">
+                                    <p
+                                      className="cursor-pointer"
+                                      onClick={() => editTask(task)}
+                                    >
+                                      Edit
+                                    </p>
+                                    <p
+                                      className="cursor-pointer ml-4"
+                                      onClick={() => deleteTask(task.id)}
+                                    >
+                                      Delete
+                                    </p>
+                                  </div>
+                                </td>
+                              </tr>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </tbody>
+                  )}
+                </Droppable>
+              </DragDropContext>
               <tbody>
-                {allTasks.map((task, idx) => (
-                  <tr className="h-24 border-gray-300 border-b" key={idx}>
-                    <td className="text-sm pr-6 whitespace-no-wrap text-gray-800 tracking-normal leading-4">
-                      {task.id}
-                    </td>
-                    <td className="text-sm pr-6 whitespace-no-wrap text-gray-800 tracking-normal leading-4">
-                      {task.task_name}
-                    </td>
-                    <td className="text-sm pr-6 whitespace-no-wrap text-gray-800 tracking-normal leading-4">
-                      {task.task_date}
-                    </td>
-                    <td className="pr-8 relative ">{task.action}</td>
-                    <td className="pr-8  w-32">
-                      <div className="flex items-center relative">
-                        <p
-                          className="cursor-pointer"
-                          onClick={() => editTask(task)}
-                        >
-                          Edit
-                        </p>
-                        <p
-                          className="cursor-pointer ml-4"
-                          onClick={() => deleteTask(task.id)}
-                        >
-                          Delete
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
               </tbody>
             </table>
           </div>
@@ -143,7 +221,7 @@ const TaskPopup = ({
     task_name: "",
     id: "",
     task_date: "",
-    action: "",
+    actions: [],
   });
   const dispatch = useDispatch();
 
@@ -171,14 +249,43 @@ const TaskPopup = ({
     }
   };
   const actions = [
-    "Going to the park",
-    "Finish Homework",
-    "Call My Father",
-    "Bring gift to my sister birthday",
+    {
+      label: "Going to the park",
+      value: "Going to the park"
+    },
+    {
+      label: "Finish Homework",
+      value: "Finish Homework"
+    },
+    {
+      label: "Call My Father",
+      value: "Call My Father"
+    },
+    {
+      label: "Bring gift to my sister birthday",
+      value: "Bring gift to my sister birthday"
+    },
   ];
+  const handleSelectMultiple = (selected: any) => {
+    setFormData({ ...formData, actions: selected })
+  }
   return (
     <div className="max-w-md m-auto my-16 absolute w-full shadow-lg rounded-md inset-0 z-20 bg-white p-6">
-      <h2 className="text-lg">Create task</h2>
+       <div className="flex justify-between items-center">
+        <h2 className="text-lg">Create Task</h2>
+        <div onClick={() => setTaskPopup(false)} className="cursor-pointer">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={20}
+            height={20}
+            fill="currentColor"
+            className="bi bi-x"
+            viewBox="0 0 16 16"
+          >
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+          </svg>
+        </div>
+      </div>
       <form onSubmit={(e) => onSubmit(e)}>
         <div className="my-4">
           <label>
@@ -222,7 +329,13 @@ const TaskPopup = ({
         </div>
         <div className="my-4">
           Action
-          <select
+          <MultiSelect
+            options={actions}
+            value={formData?.actions}
+            onChange={handleSelectMultiple}
+            labelledBy="Select"
+          />
+          {/* <select
             defaultValue={formData?.action}
             required
             className="border border-gray-300 p-2 rounded ml-4"
@@ -237,7 +350,7 @@ const TaskPopup = ({
                 </option>
               );
             })}
-          </select>
+          </select> */}
         </div>
 
         <button

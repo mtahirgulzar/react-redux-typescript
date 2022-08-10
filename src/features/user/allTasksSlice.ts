@@ -7,7 +7,7 @@ type Task = {
   id: string;
   task_name: string;
   task_date: string;
-  action: string;
+  actions: { label: string; value: string }[];
 };
 const initialState: allTasksState = {
   allTasks: [
@@ -15,13 +15,47 @@ const initialState: allTasksState = {
       id: "1",
       task_name: "Task 1",
       task_date: "Mon 08/08/2022",
-      action: "Call My Father",
+      actions: [
+        {
+          label: "Going to the park",
+          value: "Going to the park",
+        },
+        {
+          label: "Finish Homework",
+          value: "Finish Homework",
+        },
+        {
+          label: "Call My Father",
+          value: "Call My Father",
+        },
+        {
+          label: "Bring gift to my sister birthday",
+          value: "Bring gift to my sister birthday",
+        },
+      ],
     },
     {
       id: "2",
       task_name: "Task 1",
       task_date: "Mon 08/08/2022",
-      action: "Going to the park",
+      actions: [
+        {
+          label: "Going to the park",
+          value: "Going to the park",
+        },
+        {
+          label: "Finish Homework",
+          value: "Finish Homework",
+        },
+        {
+          label: "Call My Father",
+          value: "Call My Father",
+        },
+        {
+          label: "Bring gift to my sister birthday",
+          value: "Bring gift to my sister birthday",
+        },
+      ],
     },
   ],
 };
@@ -38,3 +72,4 @@ export const allTasksSlice = createSlice({
 
 export const { addNewTask } = allTasksSlice.actions;
 export default allTasksSlice.reducer;
+

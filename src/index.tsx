@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 import { PersistGate } from "redux-persist/integration/react";
 import { ToastContainer } from "react-toastify";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/login";
 import App from "./App";
 import Users from "./pages/users";
@@ -18,7 +18,7 @@ const root = createRoot(container);
 
 
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
@@ -32,7 +32,7 @@ root.render(
         <ToastContainer position="top-center"/>
       </PersistGate>
     </Provider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

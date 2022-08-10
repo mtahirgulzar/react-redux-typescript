@@ -41,7 +41,7 @@ const Users = () => {
           {<Link to="/tasks">Tasks</Link>}
         </div>
         <button
-          className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 px-8"
+          className="focus:ring-2 ml-auto focus:ring-offset-2 focus:ring-indigo-700 text-sm font-semibold leading-none text-white focus:outline-none bg-indigo-700 border rounded hover:bg-indigo-600 py-4 px-8"
           onClick={() => {
             dispatch(addCurrentUser({}));
             navigate("/login");
@@ -202,7 +202,7 @@ const UserPopup = ({
   return (
     <div className="max-w-md m-auto my-16 absolute w-full shadow-lg rounded-md inset-0 z-20 bg-white p-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg">Create task</h2>
+        <h2 className="text-lg">Create User</h2>
         <div onClick={() => setUserPopup(false)} className="cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
